@@ -218,7 +218,6 @@
 
     <div class="controls">
       <button id="playBtn">Şarkıyı Başlat 🎵</button>
-      <button id="stopBtn" class="ghost">Durdur ⏸</button>
       <button id="blowBtn" class="ghost">Mumu Söndür 💨</button>
     </div>
 
@@ -253,31 +252,23 @@
       if (!on) burstConfetti(160);
     }
 
-    // --- Audio controls (MP3)
+    // --- Audio (MP3)
     const song = document.getElementById("birthdaySong");
-    const playBtn = document.getElementById("playBtn");
-    const stopBtn = document.getElementById("stopBtn");
 
-    playBtn.addEventListener("click", async () => {
+    document.getElementById("playBtn").addEventListener("click", async () => {
       try {
-        song.currentTime = 0;
+        song.currentTime = 0;   // baştan başlasın
         await song.play();
         setFlame(true);
         burstConfetti(150);
       } catch (e) {
-        // mobil tarayıcılarda nadiren engellenirse:
         alert("Ses başlatılamadı. Telefon sessizde olmasın ve tekrar 'Şarkıyı Başlat' butonuna bas.");
       }
     });
 
-    stopBtn.addEventListener("click", () => {
-      song.pause();
-      song.currentTime = 0;
-    });
-
+    // ✅ Mum söndürmek şarkıyı DURDURMAZ
     document.getElementById("blowBtn").addEventListener("click", () => {
       setFlame(false);
-      song.pause();
     });
 
     // Tap cake: toggle flame
