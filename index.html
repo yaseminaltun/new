@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title> İyi ki doğdun Arda!</title>
+  <title>İyi ki doğdun Arda!</title>
   <style>
     :root { --bg1:#0b1020; --bg2:#1a2a6c; --bg3:#b21f1f; --bg4:#fdbb2d; }
     * { box-sizing: border-box; }
@@ -189,19 +189,13 @@
     @keyframes fall{
       to{ transform: translateY(110vh) rotate(720deg); }
     }
-
-    .footerNote{
-      margin-top: 12px;
-      opacity:.8;
-      font-size: 13px;
-    }
   </style>
 </head>
 <body>
   <div class="confetti" id="confetti"></div>
 
   <main class="card">
-    <h1 id="title">🎉 İyi ki doğdun!</h1>
+    <h1 id="title">🎉 İyi ki doğdun Arda!</h1>
     <p class="sub" id="subtitle">Dilek tut ve mumu üfle ✨</p>
 
     <section class="cakeWrap" aria-label="Doğum günü pastası">
@@ -224,13 +218,15 @@
 
     <div class="controls">
       <button id="playBtn">Şarkıyı Başlat 🎵</button>
+      <button id="stopBtn" class="ghost">Durdur ⏸</button>
       <button id="blowBtn" class="ghost">Mumu Söndür 💨</button>
     </div>
 
+    <!-- MP3 aynı klasörde olmalı: dogum-gunu.mp3 -->
+    <audio id="birthdaySong" src="dogum-gunu.mp3" preload="auto"></audio>
   </main>
 
   <script>
-
     // --- Confetti
     const confettiRoot = document.getElementById("confetti");
     function burstConfetti(count = 120) {
@@ -245,7 +241,6 @@
         p.style.transform = `rotate(${Math.random() * 360}deg)`;
         p.style.width = (Math.random() * 8 + 6) + "px";
         p.style.height = (Math.random() * 12 + 8) + "px";
-        p.style.animationName = "fall";
         confettiRoot.appendChild(p);
         setTimeout(() => p.remove(), 4000);
       }
@@ -258,76 +253,42 @@
       if (!on) burstConfetti(160);
     }
 
-    // --- HAPPY BIRTHDAY melody (WebAudio) - no external audio file needed
-    let audioCtx = null;
-    let isPlaying = false;
+    // --- Audio controls (MP3)
+    const song = document.getElementById("birthdaySong");
+    const playBtn = document.getElementById("playBtn");
+    const stopBtn = document.getElementById("stopBtn");
 
-    const NOTE = {
-      C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
-      C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99
-    };
-
-    // Happy Birthday (common simple arrangement) in C major-ish
-    const melody = [
-      ["G4", 0.35], ["G4", 0.35], ["A4", 0.7],  ["G4", 0.7],  ["C5", 0.7], ["B4", 1.0],
-      ["G4", 0.35], ["G4", 0.35], ["A4", 0.7],  ["G4", 0.7],  ["D5", 0.7], ["C5", 1.0],
-      ["G4", 0.35], ["G4", 0.35], ["G5", 0.7],  ["E5", 0.7],  ["C5", 0.7], ["B4", 0.7], ["A4", 1.0],
-      ["F5", 0.35], ["F5", 0.35], ["E5", 0.7],  ["C5", 0.7],  ["D5", 0.7], ["C5", 1.2],
-    ];
-
-    function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
-
-    async function playTone(freq, durationSec) {
-      if (!audioCtx) return;
-      const o = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-
-      o.type = "triangle";
-      o.frequency.value = freq;
-
-      // envelope
-      const now = audioCtx.currentTime;
-      g.gain.setValueAtTime(0.0001, now);
-      g.gain.exponentialRampToValueAtTime(0.25, now + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
-
-      o.connect(g).connect(audioCtx.destination);
-      o.start(now);
-      o.stop(now + durationSec);
-
-      await sleep(durationSec * 1000);
-    }
-
-    async function playMelody() {
-      if (isPlaying) return;
-      isPlaying = true;
-
-      // must be created on user gesture (button click) for mobile autoplay rules
-      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === "suspended") await audioCtx.resume();
-
-      setFlame(true);
-      burstConfetti(120);
-
-      for (const [n, d] of melody) {
-        await playTone(NOTE[n], d);
-        await sleep(40);
+    playBtn.addEventListener("click", async () => {
+      try {
+        song.currentTime = 0;
+        await song.play();
+        setFlame(true);
+        burstConfetti(150);
+      } catch (e) {
+        // mobil tarayıcılarda nadiren engellenirse:
+        alert("Ses başlatılamadı. Telefon sessizde olmasın ve tekrar 'Şarkıyı Başlat' butonuna bas.");
       }
+    });
 
-      isPlaying = false;
-    }
-
-    document.getElementById("playBtn").addEventListener("click", playMelody);
+    stopBtn.addEventListener("click", () => {
+      song.pause();
+      song.currentTime = 0;
+    });
 
     document.getElementById("blowBtn").addEventListener("click", () => {
       setFlame(false);
+      song.pause();
     });
 
-    // little extra: tap the cake to toggle flame
+    // Tap cake: toggle flame
     document.querySelector(".cake").addEventListener("click", () => {
       const off = flame.classList.contains("off");
-      setFlame(off); // if off -> on, if on -> off? (inverse)
-      // Actually: setFlame(off) turns ON when off==true. Nice toggle.
+      setFlame(off);
+    });
+
+    // Şarkı bitince konfeti
+    song.addEventListener("ended", () => {
+      burstConfetti(220);
     });
   </script>
 </body>
