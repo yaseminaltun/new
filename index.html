@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>🎂 İyi ki doğdun!</title>
+  <title> İyi ki doğdun Arda!</title>
   <style>
     :root { --bg1:#0b1020; --bg2:#1a2a6c; --bg3:#b21f1f; --bg4:#fdbb2d; }
     * { box-sizing: border-box; }
@@ -227,19 +227,9 @@
       <button id="blowBtn" class="ghost">Mumu Söndür 💨</button>
     </div>
 
-    <div class="footerNote">
-      (İpucu: Linke isim ekleyebilirsin: <code>?name=Ayşe</code>)
-    </div>
   </main>
 
   <script>
-    // --- Personalize with ?name=
-    const params = new URLSearchParams(location.search);
-    const name = params.get("name");
-    if (name) {
-      document.getElementById("title").textContent = `🎉 İyi ki doğdun, ${name}!`;
-      document.title = `🎂 İyi ki doğdun, ${name}!`;
-    }
 
     // --- Confetti
     const confettiRoot = document.getElementById("confetti");
